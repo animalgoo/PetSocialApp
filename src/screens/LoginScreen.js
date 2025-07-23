@@ -1,110 +1,190 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
-import { useUI } from '../contexts/UIContext';
-import { API } from '../services/api';
+import React, { useState } from 'react';
+import {
+  StyleSheet,
+  Text,
+  View,
+  TextInput,
+  TouchableOpacity,
+  ImageBackground,
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StatusBar,
+} from 'react-native';
 
-const LoginScreen = ({ navigation }) => {
-  const { colors } = useUI();
+// URL da imagem de fundo. Usar uma URL externa evita ter que adicionar o arquivo ao projeto.
+const BACKGROUND_IMAGE_URL = 'https://images.pexels.com/photos/1461013/pexels-photo-1461301.jpeg';
 
-  const handleLogin = (provider) => {
-    // Simulate login for now
-    console.log(`Login with ${provider}`);
-    // In a real app, this would redirect to the OAuth provider
-    // and then back to the app with a token.
-    // For now, we'll just navigate to the main app.
-    navigation.replace('Main');
-  };
+const LoginScreen = ({ navigation } ) => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
-  const handleGuestLogin = () => {
-    navigation.replace('Main');
+  const handleLogin = () => {
+    // Aqui você manterá sua lógica de login original.
+    // Por enquanto, vamos apenas simular a navegação.
+    console.log('Tentando login com:', email, password);
+    // Exemplo: navigation.navigate('Main');
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <Image
-        source={require('../../assets/animalgo_logo.png')}
-        style={styles.logo}
-        resizeMode="contain"
-      />
-      <Text style={[styles.tagline, { color: colors.textSecondary }]}>AQUI SEU PET QUEM MANDA</Text>
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    >
+      <StatusBar barStyle="light-content" />
+      <ImageBackground
+        source={{ uri: BACKGROUND_IMAGE_URL }}
+        style={styles.backgroundImage}
+        resizeMode="cover"
+      >
+        {/* Overlay escuro para melhorar a legibilidade */}
+        <View style={styles.overlay}>
+          <ScrollView contentContainerStyle={styles.scrollContainer}>
+            {/* Logo da Aplicação */}
+            <Image
+              source={require('../../assets/logo.png')} // <-- ATENÇÃO: Verifique se este é o caminho correto para o seu logo
+              style={styles.logo}
+            />
 
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity
-          style={[styles.socialButton, { backgroundColor: '#DB4437' }]} // Google Red
-          onPress={() => handleLogin('Google')}
-        >
-          <Text style={styles.buttonText}>Login com Google</Text>
-        </TouchableOpacity>
+            <Text style={styles.title}>Login</Text>
 
-        <TouchableOpacity
-          style={[styles.socialButton, { backgroundColor: '#4267B2' }]} // Facebook Blue
-          onPress={() => handleLogin('Facebook')}
-        >
-          <Text style={styles.buttonText}>Login com Facebook</Text>
-        </TouchableOpacity>
+            {/* Formulário de Entrada */}
+            <View style={styles.inputContainer}>
+              <TextInput
+                style={styles.input}
+                placeholder="Seu e-mail"
+                placeholderTextColor="#999"
+                value={email}
+                onChangeText={setEmail}
+                keyboardType="email-address"
+                autoCapitalize="none"
+              />
+              <TextInput
+                style={styles.input}
+                placeholder="Sua senha"
+                placeholderTextColor="#999"
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry
+              />
+            </View>
 
-        <TouchableOpacity
-          style={[styles.socialButton, { backgroundColor: '#E1306C' }]} // Instagram Pink
-          onPress={() => handleLogin('Instagram')}
-        >
-          <Text style={styles.buttonText}>Login com Instagram</Text>
-        </TouchableOpacity>
+            <TouchableOpacity onPress={() => console.log('Esqueci a senha clicado')}>
+              <Text style={styles.forgotPasswordText}>Esqueceu a senha?</Text>
+            </TouchableOpacity>
 
-        <TouchableOpacity
-          style={[styles.guestButton, { borderColor: colors.primary }]} // Primary color border
-          onPress={handleGuestLogin}
-        >
-          <Text style={[styles.guestButtonText, { color: colors.primary }]}>Continuar como Visitante</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+            {/* Botão de Login Principal */}
+            <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
+              <Text style={styles.loginButtonText}>Entrar</Text>
+            </TouchableOpacity>
+
+            {/* Seção de Cadastro */}
+            <View style={styles.signupContainer}>
+              <Text style={styles.signupText}>Não tem uma conta?</Text>
+              <TouchableOpacity onPress={() => console.log('Cadastre-se clicado')}>
+                <Text style={styles.signupLink}> Cadastre-se</Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* 
+              Os botões de login com redes sociais foram removidos da interface,
+              conforme solicitado. A lógica pode ser reativada no futuro.
+            */}
+
+          </ScrollView>
+        </View>
+      </ImageBackground>
+    </KeyboardAvoidingView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  backgroundImage: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
+  },
+  overlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Overlay escuro para contraste
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
+    paddingHorizontal: 20,
+  },
+  scrollContainer: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '100%',
   },
   logo: {
-    width: 200,
-    height: 200,
-    marginBottom: 10,
+    width: 120,
+    height: 120,
+    resizeMode: 'contain',
+    marginBottom: 30,
   },
-  tagline: {
-    fontSize: 16,
-    marginBottom: 40,
-  },
-  buttonContainer: {
-    width: '100%',
-    maxWidth: 300,
-  },
-  socialButton: {
-    padding: 15,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  buttonText: {
+  title: {
+    fontSize: 32,
+    fontWeight: 'bold',
     color: '#FFFFFF',
+    marginBottom: 20,
+    alignSelf: 'flex-start',
+  },
+  inputContainer: {
+    width: '100%',
+    marginBottom: 10,
+  },
+  input: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 10,
+    paddingVertical: 15,
+    paddingHorizontal: 20,
     fontSize: 16,
+    color: '#333',
+    width: '100%',
+    marginBottom: 15,
+  },
+  forgotPasswordText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    alignSelf: 'flex-end',
+    marginBottom: 20,
+  },
+  loginButton: {
+    backgroundColor: '#2D9CDB', // Um azul moderno, similar ao modelo
+    borderRadius: 10,
+    paddingVertical: 18,
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    elevation: 3, // Sombra para Android
+    shadowColor: '#000', // Sombra para iOS
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+  },
+  loginButtonText: {
+    color: '#FFFFFF',
+    fontSize: 18,
     fontWeight: 'bold',
   },
-  guestButton: {
-    padding: 15,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginTop: 20,
-    borderWidth: 2,
+  signupContainer: {
+    flexDirection: 'row',
+    marginTop: 30,
   },
-  guestButtonText: {
-    fontSize: 16,
+  signupText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+  },
+  signupLink: {
+    color: '#2D9CDB', // Cor do link igual ao botão para consistência
+    fontSize: 14,
     fontWeight: 'bold',
   },
 });
 
 export default LoginScreen;
-
-
